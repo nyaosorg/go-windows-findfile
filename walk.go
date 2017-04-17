@@ -33,7 +33,7 @@ func (this *FileInfo) Name() string {
 }
 
 func (this *FileInfo) Size() int64 {
-	return int64((this.FileSizeHigh << 32) | this.FileSizeLow)
+	return int64((int64(this.FileSizeHigh) << 32) | int64(this.FileSizeLow))
 }
 
 func (this *FileInfo) ModTime() time.Time {
