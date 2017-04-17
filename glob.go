@@ -1,6 +1,7 @@
 package findfile
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -13,6 +14,15 @@ func Glob(pattern string) ([]string, error) {
 	}
 	match := make([]string, 0, 100)
 	dirname := filepath.Dir(pattern)
+	if strings.HasPrefix(pattern, `~/`) || strings.HasPrefix(pattern, `~\`) {
+		home := os.Getenv("HOME")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		if home != "" {
+			pattern = home + pattern[1:]
+		}
+	}
 	err := Walk(pattern, func(findf *FileInfo) bool {
 		name := findf.Name()
 		if (name[0] != '.' || pname[0] == '.') && !findf.IsHidden() {
