@@ -6,9 +6,9 @@ import (
 )
 
 func GetFileAttributes(status os.FileInfo) uint32 {
-	if it, ok := status.Sys().(*syscall.Win32FileAttributeData); ok {
+	if it, ok := status.Sys().(*syscall.Win32FileAttributeData); ok && it != nil {
 		return it.FileAttributes
-	} else if it, ok := status.(*FileInfo); ok {
+	} else if it, ok := status.(*FileInfo); ok && it != nil {
 		return it.FileAttributes
 	} else {
 		panic("Can not get fileatttribute")
