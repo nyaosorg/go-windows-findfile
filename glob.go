@@ -25,7 +25,7 @@ func Glob(pattern string) ([]string, error) {
 	}
 	err := Walk(pattern, func(findf *FileInfo) bool {
 		name := findf.Name()
-		if (name[0] != '.' || pname[0] == '.') && !findf.IsHidden() {
+		if (!strings.HasPrefix(name, ".") || strings.HasPrefix(pname, ".")) && !findf.IsHidden() {
 			match = append(match, filepath.Join(dirname, name))
 		}
 		return true

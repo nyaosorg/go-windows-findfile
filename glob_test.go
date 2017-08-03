@@ -5,8 +5,16 @@ import (
 )
 
 func TestGlob(t *testing.T) {
-	println("*** part-i ***")
-	Glob("*")
-	println("*** part-ii ***")
-	Glob("")
+	for _, pattern1 := range []string{"*", "", ".*"} {
+		println("<test for '" + pattern1 + "'>")
+		list, err := Glob(pattern1)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if list != nil {
+			for _, p := range list {
+				println(p)
+			}
+		}
+	}
 }
