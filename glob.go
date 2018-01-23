@@ -3,8 +3,11 @@ package findfile
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
+
+var envPattern = regexp.MustCompile(`%\w+%`)
 
 // Expand filenames matching with wildcard-pattern.
 func Glob(pattern string) ([]string, error) {
@@ -23,6 +26,10 @@ func Glob(pattern string) ([]string, error) {
 			pattern = home + pattern[1:]
 		}
 	}
+	pattern = envPattern.ReplaceAllStringFunc(pattern, func(m string) string {
+		name := m[1 : len(m)-1]
+		return os.Getenv(name)
+	})
 	err := Walk(pattern, func(findf *FileInfo) bool {
 		name := findf.Name()
 		if (!strings.HasPrefix(name, ".") || strings.HasPrefix(pname, ".")) && !findf.IsHidden() {
