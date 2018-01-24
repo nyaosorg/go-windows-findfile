@@ -9,14 +9,7 @@ import (
 
 var envPattern = regexp.MustCompile(`%\w+%`)
 
-// Expand filenames matching with wildcard-pattern.
-func Glob(pattern string) ([]string, error) {
-	pname := filepath.Base(pattern)
-	if strings.IndexAny(pname, "*?") < 0 {
-		return nil, nil
-	}
-	match := make([]string, 0, 100)
-	dirname := filepath.Dir(pattern)
+func ExpandEnv(pattern string) string {
 	if strings.HasPrefix(pattern, `~/`) || strings.HasPrefix(pattern, `~\`) {
 		home := os.Getenv("HOME")
 		if home == "" {
@@ -30,6 +23,18 @@ func Glob(pattern string) ([]string, error) {
 		name := m[1 : len(m)-1]
 		return os.Getenv(name)
 	})
+	return os.ExpandEnv(pattern)
+}
+
+// Expand filenames matching with wildcard-pattern.
+func Glob(pattern string) ([]string, error) {
+	pname := filepath.Base(pattern)
+	if strings.IndexAny(pname, "*?") < 0 {
+		return nil, nil
+	}
+	match := make([]string, 0, 100)
+	dirname := filepath.Dir(pattern)
+	pattern = ExpandEnv(pattern)
 	err := Walk(pattern, func(findf *FileInfo) bool {
 		name := findf.Name()
 		if (!strings.HasPrefix(name, ".") || strings.HasPrefix(pname, ".")) && !findf.IsHidden() {
