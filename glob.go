@@ -9,6 +9,8 @@ import (
 
 var envPattern = regexp.MustCompile(`%\w+%`)
 
+// ExpandEnv replace ~/ and ~\ to %HOME% or %USERPROFILE%,
+// and %ENVIRONMENTVARIABLE% to its' value.
 func ExpandEnv(pattern string) string {
 	if strings.HasPrefix(pattern, `~/`) || strings.HasPrefix(pattern, `~\`) {
 		home := os.Getenv("HOME")
@@ -26,7 +28,7 @@ func ExpandEnv(pattern string) string {
 	return os.ExpandEnv(pattern)
 }
 
-// Expand filenames matching with wildcard-pattern.
+// Glob expands filenames matching with wildcard-pattern.
 func Glob(pattern string) ([]string, error) {
 	pname := filepath.Base(pattern)
 	if strings.IndexAny(pname, "*?") < 0 {
@@ -45,6 +47,7 @@ func Glob(pattern string) ([]string, error) {
 	return match, err
 }
 
+// Globs expands filenames matching with wildcard-patterns.
 func Globs(patterns []string) []string {
 	result := make([]string, 0, len(patterns))
 	for _, pattern1 := range patterns {
