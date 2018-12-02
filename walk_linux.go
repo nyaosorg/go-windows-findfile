@@ -22,6 +22,10 @@ func (fi *FileInfo) IsSystem() bool {
 	return false
 }
 
+func (fi *FileInfo) IsReparsePoint() bool {
+	return false
+}
+
 func Walk(pattern string, callback func(*FileInfo) bool) error {
 	dir := filepath.Dir(pattern)
 	fnamepattern := filepath.Base(pattern)
