@@ -2,6 +2,8 @@ package findfile
 
 import (
 	"os"
+	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -106,10 +108,15 @@ func Walk(pattern string, callback func(*FileInfo) bool) error {
 	if err != nil {
 		return err
 	}
+	_pattern := strings.ToUpper(pattern)
 	defer this.close()
 	for {
-		if !callback(this.clone()) {
-			return nil
+		_name := strings.ToUpper(this.Name())
+		matched, err := filepath.Match(_pattern, _name)
+		if err == nil && matched {
+			if !callback(this.clone()) {
+				return nil
+			}
 		}
 		if err := this.findNext(); err != nil {
 			return nil
