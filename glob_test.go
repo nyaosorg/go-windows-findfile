@@ -8,7 +8,7 @@ import (
 func TestExpandEnv(t *testing.T) {
 	temp := os.Getenv("TEMP")
 	if ExpandEnv("%TEMP%") != temp {
-		t.Fatal(`Fail: ExpandEnv("%TEMP%")`)
+		t.Fatal(`Fail: ExpandEnv("% TEMP%")`)
 		return
 	}
 	if ExpandEnv("$TEMP") != temp {
