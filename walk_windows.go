@@ -108,7 +108,7 @@ func Walk(pattern string, callback func(*FileInfo) bool) error {
 	if err != nil {
 		return err
 	}
-	_pattern := strings.ToUpper(pattern)
+	_pattern := strings.ToUpper(filepath.Base(pattern))
 	defer this.close()
 	for {
 		_name := strings.ToUpper(this.Name())
