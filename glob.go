@@ -2,16 +2,23 @@ package findfile
 
 import (
 	"os"
+	"os/user"
 	"path/filepath"
 	"regexp"
 	"strings"
 )
 
 var envPattern = regexp.MustCompile(`%\w+%`)
+var homePattern = regexp.MustCompile(`^~(\w+)`)
 
 // ExpandEnv replace ~/ and ~\ to %HOME% or %USERPROFILE%,
 // and %ENVIRONMENTVARIABLE% to its' value.
 func ExpandEnv(pattern string) string {
+	if m := homePattern.FindStringSubmatch(pattern); m != nil {
+		if u, err := user.Lookup(m[1]); err == nil {
+			pattern = u.HomeDir + pattern[len(m[0]):]
+		}
+	}
 	if strings.HasPrefix(pattern, `~/`) || strings.HasPrefix(pattern, `~\`) {
 		home := os.Getenv("HOME")
 		if home == "" {
