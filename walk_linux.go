@@ -6,27 +6,27 @@ import (
 	"path/filepath"
 )
 
-type FileInfo struct {
+type _FileInfo struct {
 	os.FileInfo
 }
 
-func (fi *FileInfo) IsReadOnly() bool {
+func (fi *_FileInfo) IsReadOnly() bool {
 	return (fi.Mode() & 0200) == 0
 }
 
-func (this *FileInfo) IsHidden() bool {
+func (this *_FileInfo) IsHidden() bool {
 	return false
 }
 
-func (fi *FileInfo) IsSystem() bool {
+func (fi *_FileInfo) IsSystem() bool {
 	return false
 }
 
-func (fi *FileInfo) IsReparsePoint() bool {
+func (fi *_FileInfo) IsReparsePoint() bool {
 	return false
 }
 
-func Walk(pattern string, callback func(*FileInfo) bool) error {
+func walk(pattern string, callback func(*_FileInfo) bool) error {
 	dir := filepath.Dir(pattern)
 	fnamepattern := filepath.Base(pattern)
 
@@ -39,7 +39,7 @@ func Walk(pattern string, callback func(*FileInfo) bool) error {
 		if err != nil {
 			return err
 		}
-		if match && !callback(&FileInfo{file}) {
+		if match && !callback(&_FileInfo{file}) {
 			break
 		}
 	}

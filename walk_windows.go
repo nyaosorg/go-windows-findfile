@@ -9,22 +9,22 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-// FileInfo is the struct for Walk()'s parameter
-type FileInfo struct {
+// _FileInfo is the struct for Walk()'s parameter
+type _FileInfo struct {
 	windows.Win32finddata
 	handle windows.Handle
 }
 
-func (fi *FileInfo) clone() *FileInfo {
-	return &FileInfo{fi.Win32finddata, fi.handle}
+func (fi *_FileInfo) clone() *FileInfo {
+	return &_FileInfo{fi.Win32finddata, fi.handle}
 }
 
-func findFirst(pattern string) (*FileInfo, error) {
+func findFirst(pattern string) (*_FileInfo, error) {
 	pattern16, err := windows.UTF16PtrFromString(pattern)
 	if err != nil {
 		return nil, err
 	}
-	this := new(FileInfo)
+	this := new(_FileInfo)
 	this.handle, err = windows.FindFirstFile(pattern16, &this.Win32finddata)
 	if err != nil {
 		return nil, err
@@ -33,22 +33,22 @@ func findFirst(pattern string) (*FileInfo, error) {
 }
 
 // Name returns file's name
-func (fi *FileInfo) Name() string {
+func (fi *_FileInfo) Name() string {
 	return windows.UTF16ToString(fi.FileName[:])
 }
 
 // Size returns file's size by bytes
-func (fi *FileInfo) Size() int64 {
+func (fi *_FileInfo) Size() int64 {
 	return int64((int64(fi.FileSizeHigh) << 32) | int64(fi.FileSizeLow))
 }
 
 // ModTime returns timestamp when the file was last updated.
-func (fi *FileInfo) ModTime() time.Time {
+func (fi *_FileInfo) ModTime() time.Time {
 	return time.Unix(0, fi.LastWriteTime.Nanoseconds())
 }
 
 // Mode emurates os.FileMode.
-func (fi *FileInfo) Mode() os.FileMode {
+func (fi *_FileInfo) Mode() os.FileMode {
 	m := os.FileMode(0444)
 	if fi.IsDir() {
 		m |= 0111 | os.ModeDir
@@ -59,52 +59,52 @@ func (fi *FileInfo) Mode() os.FileMode {
 	return m
 }
 
-// Sys returns underlying data source like os.FileInfo.Sys()
-func (fi *FileInfo) Sys() interface{} {
+// Sys returns underlying data source like os._FileInfo.Sys()
+func (fi *_FileInfo) Sys() interface{} {
 	return &fi.Win32finddata
 }
 
-func (fi *FileInfo) findNext() error {
+func (fi *_FileInfo) findNext() error {
 	return windows.FindNextFile(fi.handle, &fi.Win32finddata)
 }
 
-func (fi *FileInfo) close() {
+func (fi *_FileInfo) close() {
 	windows.FindClose(fi.handle)
 }
 
 // Attribute returns attributes-bit of the file.
-func (fi *FileInfo) Attribute() uint32 {
+func (fi *_FileInfo) Attribute() uint32 {
 	return fi.FileAttributes
 }
 
 // IsReparsePoint returns true when the file has a reparse point attribute.
-func (fi *FileInfo) IsReparsePoint() bool {
+func (fi *_FileInfo) IsReparsePoint() bool {
 	return (fi.Attribute() & windows.FILE_ATTRIBUTE_REPARSE_POINT) != 0
 }
 
 // IsReadOnly returns true when the file has a readonly attribute.
-func (fi *FileInfo) IsReadOnly() bool {
+func (fi *_FileInfo) IsReadOnly() bool {
 	return (fi.Attribute() & windows.FILE_ATTRIBUTE_READONLY) != 0
 }
 
 // IsDir returns true when the file is directory.
-func (fi *FileInfo) IsDir() bool {
+func (fi *_FileInfo) IsDir() bool {
 	return (fi.Attribute() & windows.FILE_ATTRIBUTE_DIRECTORY) != 0
 }
 
 // IsHidden returns true when the file is hidden.
-func (fi *FileInfo) IsHidden() bool {
+func (fi *_FileInfo) IsHidden() bool {
 	return (fi.Attribute() & windows.FILE_ATTRIBUTE_HIDDEN) != 0
 }
 
 // IsSystem returns true when the file has a system attribute.
-func (fi *FileInfo) IsSystem() bool {
+func (fi *_FileInfo) IsSystem() bool {
 	return (fi.Attribute() & windows.FILE_ATTRIBUTE_SYSTEM) != 0
 }
 
 // Walk enumerates the files matching patterns.
 // It uses Win32's-findfile-API.
-func Walk(pattern string, callback func(*FileInfo) bool) error {
+func walk(pattern string, callback func(*_FileInfo) bool) error {
 	this, err := findFirst(pattern)
 	if err != nil {
 		return err
