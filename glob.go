@@ -19,7 +19,10 @@ func ExpandEnv(pattern string) string {
 			pattern = u.HomeDir + pattern[len(m[0]):]
 		}
 	}
-	if strings.HasPrefix(pattern, `~/`) || strings.HasPrefix(pattern, `~\`) {
+	if strings.HasPrefix(pattern, `~/`) ||
+		strings.HasPrefix(pattern, `~\`) ||
+		pattern == `~` {
+
 		home := os.Getenv("HOME")
 		if home == "" {
 			home = os.Getenv("USERPROFILE")
