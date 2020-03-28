@@ -2,22 +2,34 @@ package findfile
 
 import (
 	"os"
+	"os/user"
+	"path/filepath"
 	"testing"
 )
 
 func TestExpandEnv(t *testing.T) {
 	temp := os.Getenv("TEMP")
-	if ExpandEnv("%TEMP%") != temp {
-		t.Fatal(`Fail: ExpandEnv("% TEMP%")`)
-		return
+	home := os.Getenv("HOME")
+	if home == "" {
+		home = os.Getenv("USERPROFILE")
 	}
-	if ExpandEnv("$TEMP") != temp {
-		t.Fatal(`Fail: ExpandEnv("$TEMP")`)
-		return
+	guest, err := user.Lookup("guest")
+	if err != nil {
+		t.Fatal(err.Error())
 	}
-	if ExpandEnv("${TEMP}") != temp {
-		t.Fatal(`Fail: ExpandEnv("${TEMP}")`)
-		return
+	tests := [][2]string{
+		{"%TEMP%", temp},
+		{"$TEMP", temp},
+		{"${TEMP}", temp},
+		{`~`, home},
+		{`~\foo`, filepath.Join(home, "foo")},
+		{`~guest\hoge`, filepath.Join(guest.HomeDir, `hoge`)},
+	}
+
+	for _, p := range tests {
+		if result := ExpandEnv(p[0]); result != p[1] {
+			t.Fatalf("Fail: ExpandEnv('%s'):'%s' != '%s'", p[0], result, p[1])
+		}
 	}
 }
 
