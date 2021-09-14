@@ -1,4 +1,4 @@
-module github.com/zetamatta/go-findfile
+module github.com/nyaosorg/go-windows-findfile
 
 go 1.15
 

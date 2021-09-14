@@ -1,4 +1,4 @@
-go-findfile
+go-windows-findfile
 ===========
 
 Windows native FindFile-API's Wrapper.(`package findfile`)
