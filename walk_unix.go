@@ -4,6 +4,7 @@
 package findfile
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -29,7 +30,7 @@ func (fi *_FileInfo) IsReparsePoint() bool {
 	return false
 }
 
-func walk(pattern string, callback func(*_FileInfo) bool) error {
+func walk(ctx context.Context, pattern string, callback func(*_FileInfo) bool) error {
 	dir := filepath.Dir(pattern)
 	fnamepattern := filepath.Base(pattern)
 
@@ -38,6 +39,13 @@ func walk(pattern string, callback func(*_FileInfo) bool) error {
 		return err
 	}
 	for _, file := range files {
+		if ctx != nil {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+			}
+		}
 		match, err := filepath.Match(fnamepattern, file.Name())
 		if err != nil {
 			return err

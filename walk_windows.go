@@ -1,6 +1,7 @@
 package findfile
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"strings"
@@ -104,7 +105,7 @@ func (fi *_FileInfo) IsSystem() bool {
 
 // Walk enumerates the files matching patterns.
 // It uses Win32's-findfile-API.
-func walk(pattern string, callback func(*_FileInfo) bool) error {
+func walk(ctx context.Context, pattern string, callback func(*_FileInfo) bool) error {
 	this, err := findFirst(pattern)
 	if err != nil {
 		return err
@@ -112,6 +113,13 @@ func walk(pattern string, callback func(*_FileInfo) bool) error {
 	_pattern := strings.ToUpper(filepath.Base(pattern))
 	defer this.close()
 	for {
+		if ctx != nil {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+			}
+		}
 		_name := strings.ToUpper(this.Name())
 		matched, err := filepath.Match(_pattern, _name)
 		if err == nil && matched {
